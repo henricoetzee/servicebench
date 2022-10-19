@@ -1,0 +1,86 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>ServiceBench</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="{% static 'css.css' %}" rel="stylesheet">
+<script src="{% static 'main.js' %}"></script>
+<script src="{% static 'app.js' %}"></script>
+<script src="{% static 'app_customers.js' %}"></script>
+<script src="{% static 'app_tasks.js' %}"></script>
+<!--Sidebar thing-->
+<script>
+    {% if user.is_authenticated %}
+        usertype = {{ user.type }};
+        username = "{{ user.username }}";
+    {% endif %}
+    {% if message %}
+        init_message = "{{message}}";
+    {% else %}
+        init_message = "none"
+    {% endif %}
+    document.addEventListener("DOMContentLoaded", () => {
+        check_sidebar();
+        if (init_message != "none") {
+            show_message(init_message, "black");
+        };
+    });
+
+</script>
+<!--Begin icon stuff-->
+<link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
+<link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
+<link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
+<link rel="manifest" href="{% static 'site.webmanifest' %}">
+<!--End icon stuff-->
+</head>
+<body class="background">
+
+<div class="header" id="sidebar">
+    <a href="/" class="logo">ServiceBench</a>
+
+    {% if user.is_authenticated %}
+    <div id="headers">
+        <span><u>{{ user.username }}:</u></span>
+        {% if user.type == 0 %}
+            <a href="{% url 'create_user'%}">Create user</a>
+            <a href="javascript:get_users()">Modify user</a>
+        {% endif %}
+        {% if user.type <= 1 %}
+            <a href="javascript:customer_query()">Customers</a>
+        {% endif %}
+        <a href="javascript:task_query()">Tasks</a>
+        <a href="javascript:report_query()">Activity Report</a>
+    </div>
+    {% endif %}
+
+    <div>
+        {% if user.is_authenticated %}
+        {% if user.username == "admin" %}
+        <a href="/admin">Admin site</a><br>
+        {% endif %}
+        <a href="{% url 'change_password'%}">Change Password</a><br>
+        <a href="{% url 'logout' %}">Log out</a><br>
+        {% else %}
+        <a href="{% url 'login' %}">Log in</a><br>
+        {% endif %}
+    </div>
+</div>
+
+<div id="hide_button">
+    <a href="javascript:hide_sidebar()">≡</a>
+</div>
+
+<div id="message">
+</div>
+<div id="block">
+    {% block body %}
+    {% endblock %}
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,25 @@
+{% extends "template.html" %}
+
+{% block body %}
+    {% if user.is_authenticated %}
+        <script>
+            usertype = {{ user.type }};
+            username = "{{ user.username }}";
+            document.addEventListener('DOMContentLoaded', () => {
+                //Function to run after document is loaded
+                main();
+            });
+        </script>
+        <div class="main-body" id="main_body"><h2>Welcome {{ user.username }}.</h2>
+        {% if user.type == 1 %}
+            <p>Click on <a href="javascript:customer_query()">Customers</a> to view customers and create tasks</p>
+        {% endif %}
+            <p>Click on <a href="javascript:task_query()">Tasks</a> to view tasks</p></div>
+    {% else %}
+        <div class="main-body">
+            <h2>Welcome to ServiceBench</h2>
+            Please log in. If you do not have access, please ask your supervisor for access.<br><a href="/login">Log in</a>
+        </div>
+        
+    {% endif %}
+{% endblock %}

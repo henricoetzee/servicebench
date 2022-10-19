@@ -1,0 +1,22 @@
+{% extends "template.html" %}
+
+{% block body %}
+    <div class="main-body" id="main_body">
+        <form action="{% url 'login' %}" method="post">
+            {% csrf_token %}
+            <div>
+                <input autofocus autocomplete="off" class="text-box" name="username" type="text" placeholder="Username">
+            </div>
+            <div>
+                <input class="text-box" name="password" type="password" placeholder="Password">
+            </div>
+            <div>
+                <input class="button" type="submit" value="Log In">
+            </div>
+            <div>
+                <p>If you do not have access, ask your supervisor to create a user on the system.</p>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}

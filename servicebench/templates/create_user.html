@@ -1,0 +1,35 @@
+{% extends "template.html" %}
+
+{% block body %}
+    <div class="main-body" id="main_body">
+        <form action="{% url 'create_user' %}" method="post">
+            {% csrf_token %}
+            <h2>Create User</h2>
+            <div>
+                <p>Creates a new user on the system. Create a temporary password that the user have to change at first logon.</p>
+            </div>
+            <div>
+                <input autofocus autocomplete="off" class="text-box" name="username" type="text" placeholder="Username">
+            </div>
+            <div>
+                <input class="text-box" name="password" type="password" placeholder="Password">
+            </div>
+            <div>
+                <input class="text-box" name="password_confirm" type="password" placeholder="Password confirmation">
+            </div>
+            <div style="width: 200px; margin: auto; text-align: left">
+                User type:<br>
+                <input id="0" type="radio" name="type" value="0">
+                <label for="0">Administrator</label><br>
+                <input id="1" type="radio" name="type" value="1">
+                <label for="1">Service controller</label><br>
+                <input id="2" type="radio" name="type" value="2">
+                <label for="2">Technician</label><br>
+            </div>
+            <div>
+                <input class="button" type="submit" value="Create user">
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
