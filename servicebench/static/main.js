@@ -85,7 +85,8 @@ window.onpopstate = function(event) {
     if (event.state.where == 'render_resolve') {render_resolve(event.state.data, false)};
     if (event.state.where == 'report_query') {report_query(false)};
     if (event.state.where == 'render_report') {render_report(event.state.data, false)};
-    if (event.state.where == 'render_modify_users') {render_report(event.state.data, false)};
+    if (event.state.where == 'render_modify_users') {render_modify_users(event.state.data, false)};
+    if (event.state.where == 'render_user') {render_user(event.state.data, false)};
 }
 
 // Function to truncate string

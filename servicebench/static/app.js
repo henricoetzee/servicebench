@@ -124,10 +124,28 @@ function render_report(response, hist=true) {
 }
 
 function get_users(id=-1) {
+    url = "/modify_users?id=" + id;
+    fetch(url)
+    .then(response => response.json())
+    .then(response => {
+        if (response.status == "success") {
+            if (response.users) {
+                render_modify_users(response)
+            }else{
+                render_user(response)
+            }
+        }
+        else {show_message("Error: " + response.error)}
+    })
+    .catch(error => {show_message(error, "darkred")});
+}
+
+function modify_user(id) {
     if (document.getElementById("is_active")) {
         is_active = document.getElementById("is_active").checked;
-        pw_changed = document.getElementById("pw_changed").Checked;
-        type = document.getElementById("type").value;
+        if (document.getElementById(0).checked) {t = 0};
+        if (document.getElementById(1).checked) {t = 1};
+        if (document.getElementById(2).checked) {t = 2};
     }else{is_active = pw_changed = type = -1}
     fetch("/modify_users",{
         method: 'PUT',
@@ -138,29 +156,57 @@ function get_users(id=-1) {
         body: JSON.stringify({
             "id": id,
             "is_active": is_active,
-            "pw_changed": pw_changed,
             "type": t
         }),
         mode: 'same-origin' // Do not send CSRF token to another domain.
     })
     .then(response => response.json())
     .then(response => {
-        if (response.status == "success") {render_modify_users(response)}
-        else {show_message("Error: " + response.error)}
+        if (response.status == "success") {
+            show_message(response.message, "darkgreen")
+            get_users()
+        }else{
+            show_message(response.error, "darkred")
+        }
     })
-    .catch(error => {show_message(error, "darkred")});
+    .catch(error => {show_message(error, "darkred")})
 }
 
 function render_modify_users(response, hist=true) {
-    if (hist) {history.pushState({"where": "render_modify_users", "data": response}, "", "/reports")};
+    if (hist) {history.pushState({"where": "render_modify_users", "data": response}, "", "/users")};
     canvas = '<h2>Modify User</h2>';
     canvas += `<select id="user" class="select"><option selected disabled>Select user</option>`;
         for (u in response.users) {
             if (response.users[u] != 'admin') {
-                canvas += `<option>${response.users[u]}</option>`;
+                canvas += `<option value="${u}">${response.users[u]}</option>`;
             }
         }
     canvas += `</select>`;
     render(canvas);
-    // Add event listener for 
+    // Add event listener for select element
+    document.getElementById("user").addEventListener("change", () => {
+        get_users(document.getElementById("user").value)
+    })
+}
+
+function render_user(response, hist=true) {
+    if (hist) {history.pushState({"where": "render_user", "data": response}, "", "/users")};
+    canvas = '<h2>Modify User</h2>';
+    canvas += `<h3>${response.name}</h3>`;
+    canvas += `<div class="grid-2">`;
+    canvas += `<span class="l">User is enabled:</span><input class="checkbox" id="is_active" type="checkbox">`;
+    canvas += `</div>`;
+    canvas += `<h4>User type:</h4><div class="grid-2">
+                <input id="0" type="radio" name="type" value="0">
+                <label class="r" for="0">Administrator</label>
+                <input id="1" type="radio" name="type" value="1">
+                <label class="r" for="1">Service controller</label>
+                <input id="2" type="radio" name="type" value="2">
+                <label class="r" for="2">Technician</label></div>`;
+    canvas += `<button class="button" onclick="modify_user(${response.id})">Save</button>`
+    render(canvas);
+    // Populate:
+    document.getElementById("is_active").checked = response.is_active;
+    document.getElementById(response.type).checked = true;
+
 }

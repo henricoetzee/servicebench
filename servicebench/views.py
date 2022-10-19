@@ -395,18 +395,35 @@ def modify_users(request):
     if request.user.type != 0:
         return JsonResponse({"status": "failed", "error": "Permission denied"})
     if request.method == "GET":
-        # Return list of users
-        all_users = User.objects.values()
-        users = []
-        for u in all_users:
-            users.append(u['username'])
-        return JsonResponse({"status": "success", "users": users})
-    if request.methon == "PUT":
+        id = int(request.GET['id'])
+        if id == -1:    # Return list of users
+            all_users = User.objects.values()
+            users = {}
+            for u in all_users:
+                users[u['id']] = u['username']
+            return JsonResponse({"status": "success", "users": users})
+        else:    # Return specific user info:
+            try:
+                u = User.objects.get(id=id)
+            except Exception as e:
+                return JsonResponse({"status": "failed", "error": e})
+            return JsonResponse({
+                "status": "success",
+                "id": u.id,
+                "name": u.username,
+                "is_active": u.is_active,
+                "type": u.type
+            })
+    if request.method == "PUT":
         data = json.loads(request.body)
-        if data['id'] = -1 | data['pw_changed'] = -1 | data['is_active'] = -1 | data['type'] = -1:
+        if data['id'] == -1 | data['is_active'] == -1 | data['type'] == -1:
             return JsonResponse({"status": "failed", "error": "Data error"})
-        u = User.objects.get(id=data['id'])
-        u.pw_changed = data['pw_changed']
-        u.is_active = data['is_active']
-        u.type = data['type']            
+        try:
+            u = User.objects.get(id=data['id'])
+            u.is_active = data['is_active']
+            u.type = data['type']
+            u.save()
+        except Exception as e:
+            return JsonResponse({"status": "failed", "error": e})
+        return JsonResponse({"status": "success", "message": "User info saved"})
     return JsonResponse({"status": "failed", "error": "Request should be PUT or GET"})
